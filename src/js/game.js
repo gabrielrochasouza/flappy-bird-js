@@ -10,7 +10,13 @@ const ctx=canvas.getContext('2d')
 let started=false
 let gameOver=false
 
+/**Audio */
+const audioPular=new Audio()
+const audioCaiu=new Audio()
+audioPular.src='/audio/efeitos_pulo.wav'
+audioCaiu.src='/audio/efeitos_caiu.wav'
 
+/***********/
 const flappyBird={
     largura:33,
     altura:24,
@@ -33,6 +39,7 @@ const flappyBird={
         if(this.posicaoY+this.altura>chao.canvasPosicaoY){     
             gameOver=true  
             started=false     
+            audioCaiu.play()
             mudarTela(telas.inicio)
             return
         }
@@ -43,6 +50,7 @@ const flappyBird={
     },
     pular(){
         flappyBird.velocidade= -7
+        audioPular.play()
     },
 
     quadros:[0,26,52],
@@ -137,7 +145,7 @@ const telaInicial={
     }
 
 }
-let espacamentoCano=100
+let espacamentoCano=120
 let alturaDoCano=400
 
 function randomNum(){
