@@ -1,26 +1,29 @@
 const canvas= document.querySelector('canvas')
-canvas.width=300
+canvas.width= (window.innerWidth<=360) ? window.innerWidth :360
 canvas.height=500
 const canvasWidth=canvas.width
 const canvasHeight=canvas.height
-
 const sprites=new Image()
 sprites.src='src/img/sprites.png'
-
-
 const ctx=canvas.getContext('2d')
+
+let started=false
+let gameOver=false
+
 
 const flappyBird={
     largura:33,
     altura:24,
     posicaoX:20,
-    posicaoY: 40,
+    posicaoY: 60,
+    spritePosicaoX:0,
+    spritePosicaoY:0,
     velocidade:0,
-    gravidade: 0.33,
+    gravidade: 0.25,
     desenharFlappyBird(){
         ctx.drawImage(
             sprites,
-            0,0,
+            this.spritePosicaoX,this.spritePosicaoY,
             this.largura,this.altura,
             this.posicaoX,this.posicaoY,
             this.largura,this.altura
@@ -28,21 +31,39 @@ const flappyBird={
     },
     movimentoUpdate(){
         if(this.posicaoY+this.altura>chao.canvasPosicaoY){     
-            gameOver=true       
-            mostrarTelaInicial()
+            gameOver=true  
+            started=false     
+            mudarTela(telas.inicio)
             return
         }
+        chao.movimentoChao()
+        flappyBird.animacao()
         this.velocidade=this.gravidade+this.velocidade
         this.posicaoY+=this.velocidade
-        
     },
     pular(){
         flappyBird.velocidade= -7
-    }
+    },
 
+    quadros:[0,26,52],
+    timer:0,
+    repeticao: 30,
+    indice:0,
+    animacao(){
+        this.timer++
+        let intervaloRepetidor=this.timer%this.repeticao
+
+        if(intervaloRepetidor < this.repeticao/3 && intervaloRepetidor >= 0 ) this.indice=0
+        if(intervaloRepetidor < 2*this.repeticao/3 && intervaloRepetidor >= this.repeticao/3 ) this.indice=1
+        if(intervaloRepetidor < this.repeticao && intervaloRepetidor >= 2*this.repeticao/3 ) this.indice=2 
+
+        this.spritePosicaoY= this.quadros[this.indice]
+    }
+    
 }
+
 const chao={
-    largura:canvasWidth,
+    largura:canvasWidth+40, 
     altura:121,
     imgPosicaoX:0,
     imgPosicaoY:610,
@@ -51,6 +72,11 @@ const chao={
     canvasPosicaoX: 0,
     canvasPosicaoY: canvasHeight-100,
     desenharChao(){
+        if(gameOver==false){
+            flappyBird.animacao()
+        }
+        if(gameOver==false && started==false) chao.movimentoChao()
+        
         ctx.drawImage(
             sprites,
             this.imgPosicaoX,this.imgPosicaoY,//posicao para pegar imagem em sprites
@@ -58,8 +84,16 @@ const chao={
             this.canvasPosicaoX,this.canvasPosicaoY,//posicao da imagem no canvas
             this.largura,this.altura //tamanho da imagem no canvas
         )
+    },
+    repetir:27,
+    incremento:0,
+    movimentoChao(){
+        this.incremento+=2
+        let deslocamento=this.incremento%this.repetir
+        this.canvasPosicaoX=-deslocamento
     }
 }
+
 
 const planoFundo={
     larguraCanvas:canvasWidth,
@@ -80,15 +114,18 @@ const planoFundo={
         )
     }
 }
+
+let larguraTelaInicial=180
+
 const telaInicial={
-    canvasSizeX:220 ,
-    canvasSizeY: 192,
-    canvasPosicaoX:40,
-    canvasPosicaoY:110,
+    canvasSizeX:larguraTelaInicial ,
+    canvasSizeY: 152,
+    canvasPosicaoX: (canvasWidth -larguraTelaInicial)/2,
+    canvasPosicaoY:130 ,
     imgPosicaoX:134,
     imgPosicaoY: 0,
-    imgSizeX: 207,
-    imgSizeY:192,
+    imgSizeX: 178,
+    imgSizeY:150,
     desenharTelaInicial(){
         ctx.drawImage(
             sprites,
@@ -100,7 +137,7 @@ const telaInicial={
     }
 
 }
-let espacamentoCano=120
+let espacamentoCano=100
 let alturaDoCano=400
 
 function randomNum(){
@@ -153,62 +190,84 @@ const canoBaixo={
 }
 
 
-
-function mostrarTelaInicial(){
-
-    ctx.fillStyle='lightblue'
-    ctx.fillRect(0,0,canvasWidth,canvasHeight)
-    planoFundo.desenhaFundo()
-    chao.desenharChao()
-    flappyBird.desenharFlappyBird()
-    telaInicial.desenharTelaInicial()
-    requestAnimationFrame(mostrarTelaInicial)
+let telaAtiva={}
+function mudarTela(InicioOuGame){
+    telaAtiva=InicioOuGame //InicioOuGame é um objeto ex: telas.inicio ou telas.game
 }
-mostrarTelaInicial()
 
-let clicked=false
-let started=false
-let gameOver=false
+const telas={
+    inicio:{
+        desenhar(){
+            ctx.fillStyle='lightblue'
+            ctx.fillRect(0,0,canvasWidth,canvasHeight)
+            planoFundo.desenhaFundo()
+            chao.desenharChao()
+
+            
+            flappyBird.desenharFlappyBird()
+            telaInicial.desenharTelaInicial()
+        },
+        movimentar(){
+            //flappyBird.animacao()
+            //chao.movimentoChao()
+        },
+        click(){
+            return true
+        }
+    },
+    game:{
+        desenhar(){
+            ctx.fillStyle='lightblue'
+            ctx.fillRect(0,0,canvasWidth,canvasHeight)
+            planoFundo.desenhaFundo()
+            
+            canoBaixo.desenhaCanoBaixo()
+            canosCima.desenhaCanoCima()
+            
+            chao.desenharChao()
+            
+            flappyBird.desenharFlappyBird()
+        },
+        movimentar(){
+            //chao.movimentoChao()
+            //flappyBird.animacao()
+            flappyBird.movimentoUpdate()
+            canoBaixo.movimentarEmX()
+            canosCima.movimentarEmX()
+        },
+        click(){
+            flappyBird.pular()
+
+        }
+
+    }
+}
+
+
+const arrCanos=[]
+
 
 function gameStarted(){
-    cancelAnimationFrame(mostrarTelaInicial)
+    telaAtiva.desenhar()
+    telaAtiva.movimentar()
 
-    ctx.fillStyle='lightblue'
-    ctx.fillRect(0,0,canvasWidth,canvasHeight)
-    planoFundo.desenhaFundo()
-    
-    canoBaixo.desenhaCanoBaixo()
-    canosCima.desenhaCanoCima()
-    canoBaixo.movimentarEmX()
-    canosCima.movimentarEmX()
-
-    chao.desenharChao()
-
-    flappyBird.desenharFlappyBird()
-    flappyBird.movimentoUpdate()
-  
-    if(clicked){
-        flappyBird.pular()
-    }
-    clicked=false  
-    
-    requestAnimationFrame(gameStarted)  
-    
- }
-
-
+    requestAnimationFrame(gameStarted)      
+}
+mudarTela(telas.inicio)
+gameStarted()
 
 
 
 document.addEventListener('click', ()=>{
-    clicked=true
-
-    if(started==false)gameStarted()
-    started=true
-
-    if(gameOver){
-        cancelAnimationFrame(gameStarted)
-        gameStarted()
+    if( telaAtiva.click() ){
+        started=true
+        console.log('tela do jogo ativada')
+        mudarTela(telas.game)
+        flappyBird.posicaoY=60
+        flappyBird.velocidade=0
+    }else{
+        
+        console.log('pulou')
+        telaAtiva.click()
     }
-
 })
