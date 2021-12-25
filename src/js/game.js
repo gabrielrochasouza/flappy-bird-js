@@ -13,8 +13,8 @@ let gameOver=false
 /**Audio */
 const audioPular=new Audio()
 const audioCaiu=new Audio()
-audioPular.src='/audio/efeitos_pulo.wav'
-audioCaiu.src='/audio/efeitos_caiu.wav'
+audioPular.src='../../audio/efeitos_pulo.wav'
+audioCaiu.src='../../audio/efeitos_caiu.wav'
 
 /***********/
 const flappyBird={
@@ -247,6 +247,8 @@ const telas={
             flappyBird.pular()
 
         }
+    },
+    youLose:{
 
     }
 }
