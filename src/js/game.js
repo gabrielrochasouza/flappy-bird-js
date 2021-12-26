@@ -16,8 +16,9 @@ const arrCanos=[]
 let frames=0
 let timeToStart=0
 let pontuacao=0
+let pontuacaoRecorde=0
 const span=document.querySelector('span')
-
+const recorde=document.getElementById('recorde')
 
 /**Audio */
 const audioPular=new Audio()
@@ -60,6 +61,7 @@ const flappyBird={
             audioCaiu.play()
             
             setTimeout(() => {
+                recorde.classList.remove('hidden')
                 span.classList.add('mudarPosicao')
                 mudarTela(telas.youLose)
                 passouIntervalo=true
@@ -74,7 +76,7 @@ const flappyBird={
     },
     pular(){
         this.angle=45 * Math.PI / 180
-        flappyBird.velocidade= -7
+        flappyBird.velocidade= -6
         audioPular.play()
     },
 
@@ -267,6 +269,7 @@ const telas={
             span.innerText=0
             span.classList.remove('hidden')
             span.classList.remove('mudarPosicao')
+            recorde.classList.add('hidden')
         },
         detectarColisao(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
@@ -291,7 +294,8 @@ const telas={
                     if( posicaoXFlappyBird ==baixoCanvasPosicaoX ){//marca pontos
                         pontuacao++
                         span.innerText=pontuacao
-                        
+                        pontuacaoRecorde=pontuacaoRecorde<pontuacao ? pontuacao : pontuacaoRecorde 
+                        recorde.innerText=pontuacaoRecorde
                         audioPonto.play()
                     }
                 }

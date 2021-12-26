@@ -43,9 +43,19 @@ span{
     top: 176px;
     left: 19%;
 }
+.mudarPosicao--recorde{
+    font-size: 30px;
+    top: 220px;
+    left: 19%;
+}
 @media (max-width:360px){
     .mudarPosicao {
         top: 176px;
+        left: 66%;
+        width: 21px;
+    }
+    .mudarPosicao--recorde {
+        top: 220px;
         left: 66%;
         width: 21px;
     }
