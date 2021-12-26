@@ -10,6 +10,10 @@ const ctx=canvas.getContext('2d')
 let started=false
 let gameOver=false
 
+const arrCanos=[]
+let frames=0
+let timeToStart=0
+
 /**Audio */
 const audioPular=new Audio()
 const audioCaiu=new Audio()
@@ -36,11 +40,11 @@ const flappyBird={
         )
     },
     movimentoUpdate(){
-        if(this.posicaoY+this.altura>chao.canvasPosicaoY){     
+        if(  telas.game.detectarColisao()  ){     
             gameOver=true  
             started=false     
             audioCaiu.play()
-            mudarTela(telas.inicio)
+            mudarTela(telas.youLose)
             return
         }
         chao.movimentoChao()
@@ -122,7 +126,6 @@ const planoFundo={
         )
     }
 }
-
 let larguraTelaInicial=180
 
 const telaInicial={
@@ -143,61 +146,68 @@ const telaInicial={
             this.canvasSizeX,this.canvasSizeY
         )
     }
-
 }
-let espacamentoCano=120
-let alturaDoCano=400
 
 function randomNum(){
     return Math.random()*(350-150)+150
 }
 
-const canosCima={
-    cimaCanvasSizeX: 55,//tamanho X do cano canvas
-    cimaCanvasSizeY: 500,//tamanho Y do cano canvas
-    cimaCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
-    cimaCanvasPosicaoY:canvasHeight-randomNum(),//posicao Y do cano canvas
-    cimaImgPosicaoX:0,
-    cimaImgPosicaoY:169,
-    cimaImgSizeX:54,
-    cimaImgSizeY:403,
-    desenhaCanoCima(){
-        ctx.drawImage(
-            sprites,
-            this.cimaImgPosicaoX,this.cimaImgPosicaoY,
-            this.cimaImgSizeX,this.cimaImgSizeY,
-            this.cimaCanvasPosicaoX,this.cimaCanvasPosicaoY,
-            this.cimaCanvasSizeX,this.cimaCanvasSizeY
-        )
-    },
-    movimentarEmX(){
-        this.cimaCanvasPosicaoX-=2
-    }
-}
-const canoBaixo={
-    baixoCanvasSizeX: 55,//tamanho X do cano canvas
-    baixoCanvasSizeY: 500,//tamanho Y do cano canvas
-    baixoCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
-    baixoCanvasPosicaoY:-canvasHeight-espacamentoCano+canosCima.cimaCanvasPosicaoY,//posicao Y do cano canvas
-    baixoImgPosicaoX:52,
-    baixoImgPosicaoY:170,
-    baixoImgSizeX:54,
-    baixoImgSizeY:403,
-    desenhaCanoBaixo(){
-        ctx.drawImage(
-            sprites,
-            this.baixoImgPosicaoX,this.baixoImgPosicaoY,
-            this.baixoImgSizeX,this.baixoImgSizeY,
-            this.baixoCanvasPosicaoX,this.baixoCanvasPosicaoY,
-            this.baixoCanvasSizeX,this.baixoCanvasSizeY
-        )
-    },
-    movimentarEmX(){
-        this.baixoCanvasPosicaoX-=2
-    }
-}
 
 
+const variaveisGlobais={}
+
+function criaCanos(){
+
+    const canos={
+        cimaCanvasSizeX: 55,//tamanho X do cano canvas
+        cimaCanvasSizeY: 500,//tamanho Y do cano canvas
+        cimaCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
+        cimaCanvasPosicaoY:canvasHeight-randomNum(),//posicao Y do cano canvas
+        cimaImgPosicaoX:0,
+        cimaImgPosicaoY:169,
+        cimaImgSizeX:54,
+        cimaImgSizeY:403,
+        
+        baixoCanvasSizeX: 55,//tamanho X do cano canvas
+        baixoCanvasSizeY: 500,//tamanho Y do cano canvas
+        baixoCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
+        baixoCanvasPosicaoY:0,//posicao Y do cano canvas
+        baixoImgPosicaoX:52,
+        baixoImgPosicaoY:170,
+        baixoImgSizeX:54,
+        baixoImgSizeY:403,
+
+        espacamentoCano: 120,
+        
+        gerarPosicaoAleatoriaY(){
+            this.baixoCanvasPosicaoY=-canvasHeight-this.espacamentoCano+this.cimaCanvasPosicaoY
+        },
+        desenhaCano(){
+            this.gerarPosicaoAleatoriaY()
+            ctx.drawImage(
+                sprites,
+                this.cimaImgPosicaoX,this.cimaImgPosicaoY,
+                this.cimaImgSizeX,this.cimaImgSizeY,
+                this.cimaCanvasPosicaoX,this.cimaCanvasPosicaoY,
+                this.cimaCanvasSizeX,this.cimaCanvasSizeY
+            )
+            ctx.drawImage(
+                sprites,
+                this.baixoImgPosicaoX,this.baixoImgPosicaoY,
+                this.baixoImgSizeX,this.baixoImgSizeY,
+                this.baixoCanvasPosicaoX,this.baixoCanvasPosicaoY,
+                this.baixoCanvasSizeX,this.baixoCanvasSizeY
+                )
+        },
+            movimentarEmX(){
+                this.cimaCanvasPosicaoX-=2
+                this.baixoCanvasPosicaoX-=2
+            }
+    }
+    return canos
+}
+    
+    
 let telaAtiva={}
 function mudarTela(InicioOuGame){
     telaAtiva=InicioOuGame //InicioOuGame é um objeto ex: telas.inicio ou telas.game
@@ -210,51 +220,96 @@ const telas={
             ctx.fillRect(0,0,canvasWidth,canvasHeight)
             planoFundo.desenhaFundo()
             chao.desenharChao()
-
             
             flappyBird.desenharFlappyBird()
             telaInicial.desenharTelaInicial()
         },
         movimentar(){
-            //flappyBird.animacao()
-            //chao.movimentoChao()
         },
         click(){
             return true
         }
     },
     game:{
+        inicializar(){
+            variaveisGlobais.canos=[]
+            variaveisGlobais.canos.push( criaCanos() )
+        },
+        detectarColisao(){
+            if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
+                return true
+            }
+
+
+            return false
+        },
         desenhar(){
             ctx.fillStyle='lightblue'
             ctx.fillRect(0,0,canvasWidth,canvasHeight)
             planoFundo.desenhaFundo()
-            
-            canoBaixo.desenhaCanoBaixo()
-            canosCima.desenhaCanoCima()
-            
+            this.animacaoCanosDesenho()
             chao.desenharChao()
-            
             flappyBird.desenharFlappyBird()
         },
         movimentar(){
-            //chao.movimentoChao()
-            //flappyBird.animacao()
             flappyBird.movimentoUpdate()
-            canoBaixo.movimentarEmX()
-            canosCima.movimentarEmX()
+            telas.game.animacaoCanosMovimento()
         },
         click(){
             flappyBird.pular()
-
+        },
+        animacaoCanosDesenho(){
+            timeToStart++
+            
+            if(timeToStart>70){
+                frames++
+                if(frames%81==80){
+                    variaveisGlobais.canos.push( criaCanos() )
+                    frames=0
+                }
+                for(let i=0; i<variaveisGlobais.canos.length ; i++){
+                    variaveisGlobais.canos[i].desenhaCano()
+                    if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
+                        variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
+                    }
+                }
+            }
+        },
+        animacaoCanosMovimento(){
+            if(timeToStart>70){
+                for(let i=0; i<variaveisGlobais.canos.length ; i++){
+                    variaveisGlobais.canos[i].movimentarEmX()
+                }
+            }
         }
     },
     youLose:{
+        desenhar(){
+            ctx.fillStyle='lightblue'
+            ctx.fillRect(0,0,canvasWidth,canvasHeight)
+            planoFundo.desenhaFundo()
+            telas.game.animacaoCanosDesenho()
+            chao.desenharChao()
+            flappyBird.desenharFlappyBird()
 
+            //planoFundoGameOver.desenhaFundoGameOver()
+            ctx.drawImage(
+                sprites,
+                132,151,
+                236,206,
+                (canvasWidth-236)/2,100,
+                236,206
+            )
+            
+            
+        },
+        movimentar(){
+        },
+        click(){
+            return true
+        }
     }
 }
-
-
-const arrCanos=[]
 
 
 function gameStarted(){
@@ -270,14 +325,15 @@ gameStarted()
 
 document.addEventListener('click', ()=>{
     if( telaAtiva.click() ){
+        variaveisGlobais.canos=[]
+        frames=0
+        timeToStart=0
+        telas.game.inicializar()  
         started=true
-        console.log('tela do jogo ativada')
         mudarTela(telas.game)
         flappyBird.posicaoY=60
         flappyBird.velocidade=0
     }else{
-        
-        console.log('pulou')
         telaAtiva.click()
     }
 })
