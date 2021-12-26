@@ -12,9 +12,16 @@ body{
     height: 100vh;
 }
 canvas{
-    margin: 0 auto;
-    position: relative;
     z-index: 0;
+}
+div{
+    position: relative;
+    width: 360px;
+    margin: 0 auto;
+    height: 500px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 span{
     font-family: flappyBird;
@@ -23,10 +30,23 @@ span{
     color: white;
     text-shadow: 2px 2px black;
     font-size: 50px;
-    top: 60px;
-    width: 100%;
     text-align: center;
+    width: 100%;
+    left: 0;
+    top: 20px;
 }
 .hidden{
     display: none;
+}
+.mudarPosicao{
+    font-size: 30px;
+    top: 176px;
+    left: 19%;
+}
+@media (max-width:360px){
+    .mudarPosicao {
+        top: 176px;
+        left: 66%;
+        width: 21px;
+    }
 }

@@ -7,8 +7,10 @@ const sprites=new Image()
 sprites.src='src/img/sprites.png'
 const ctx=canvas.getContext('2d')
 
+
 let started=false
 let gameOver=false
+let passouIntervalo=false
 
 const arrCanos=[]
 let frames=0
@@ -35,7 +37,11 @@ const flappyBird={
     spritePosicaoY:0,
     velocidade:0,
     gravidade: 0.30,
+    angle: 0,
+    aceleracaoAngular: 0.2* Math.PI/180,// 0.2 graus por frame quadrado 
+    velocidadeAngular: Math.PI/180, //1 grau por frame
     desenharFlappyBird(){
+        
         ctx.drawImage(
             sprites,
             this.spritePosicaoX,this.spritePosicaoY,
@@ -43,15 +49,22 @@ const flappyBird={
             this.posicaoX,this.posicaoY,
             this.largura,this.altura
         )
+       
+     
     },
     movimentoUpdate(){
         if(  telas.game.detectarColisao()  ){     
             gameOver=true  
             started=false     
+            this.velocidade=0
             audioCaiu.play()
-            span.innerText=0
-            span.classList.add('hidden')
-            mudarTela(telas.youLose)
+            
+            setTimeout(() => {
+                span.classList.add('mudarPosicao')
+                mudarTela(telas.youLose)
+                passouIntervalo=true
+            }, 200);
+            
             return
         }
         chao.movimentoChao()
@@ -60,6 +73,7 @@ const flappyBird={
         this.posicaoY+=this.velocidade
     },
     pular(){
+        this.angle=45 * Math.PI / 180
         flappyBird.velocidade= -7
         audioPular.play()
     },
@@ -82,7 +96,7 @@ const flappyBird={
 }
 
 const chao={
-    largura:canvasWidth+40, 
+    largura:224, 
     altura:121,
     imgPosicaoX:0,
     imgPosicaoY:610,
@@ -101,6 +115,13 @@ const chao={
             this.imgPosicaoX,this.imgPosicaoY,//posicao para pegar imagem em sprites
             this.imgSizeX,this.imgSizeY, //tamanho do recorte da imagem em sprites
             this.canvasPosicaoX,this.canvasPosicaoY,//posicao da imagem no canvas
+            this.largura,this.altura //tamanho da imagem no canvas
+        )
+        ctx.drawImage(
+            sprites,
+            this.imgPosicaoX,this.imgPosicaoY,//posicao para pegar imagem em sprites
+            this.imgSizeX,this.imgSizeY, //tamanho do recorte da imagem em sprites
+            (this.canvasPosicaoX+this.largura ),this.canvasPosicaoY,//posicao da imagem no canvas
             this.largura,this.altura //tamanho da imagem no canvas
         )
     },
@@ -232,6 +253,7 @@ const telas={
             telaInicial.desenharTelaInicial()
         },
         movimentar(){
+            
         },
         click(){
             
@@ -242,7 +264,9 @@ const telas={
         inicializar(){
             variaveisGlobais.canos=[]
             variaveisGlobais.canos.push( criaCanos() )
+            span.innerText=0
             span.classList.remove('hidden')
+            span.classList.remove('mudarPosicao')
         },
         detectarColisao(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
@@ -256,7 +280,7 @@ const telas={
                 let { cimaCanvasPosicaoY, espacamentoCano, baixoCanvasPosicaoX,cimaCanvasSizeX } = variaveisGlobais.canos[i]
 
                 if( posicaoXFlappyBird+larguraFlappyBird>=baixoCanvasPosicaoX &&
-                    posicaoXFlappyBird<=baixoCanvasPosicaoX+cimaCanvasSizeX ){
+                    posicaoXFlappyBird<baixoCanvasPosicaoX+cimaCanvasSizeX ){
 
                     if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
                         return true
@@ -266,8 +290,8 @@ const telas={
                     }
                     if( posicaoXFlappyBird ==baixoCanvasPosicaoX ){//marca pontos
                         pontuacao++
-                        console.log(pontuacao)
                         span.innerText=pontuacao
+                        
                         audioPonto.play()
                     }
                 }
@@ -301,16 +325,24 @@ const telas={
                 }
                 for(let i=0; i<variaveisGlobais.canos.length ; i++){
                     variaveisGlobais.canos[i].desenhaCano()
-                    if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
-                        variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
-                    }
+                    // if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
+                    //     variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
+                    // }
                 }
+                telas.game.retirarCano()
             }
         },
         animacaoCanosMovimento(){
             if(timeToStart>100){
                 for(let i=0; i<variaveisGlobais.canos.length ; i++){
                     variaveisGlobais.canos[i].movimentarEmX()
+                }
+            }
+        },
+        retirarCano(){
+            for(let i=0; i<variaveisGlobais.canos.length ; i++){
+                if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
+                    variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
                 }
             }
         }
@@ -336,6 +368,9 @@ const telas={
             
         },
         movimentar(){
+            if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY ) return
+            flappyBird.velocidade=flappyBird.gravidade+flappyBird.velocidade
+            flappyBird.posicaoY+=flappyBird.velocidade
         },
         click(){
             return true
@@ -363,8 +398,15 @@ document.addEventListener('click', ()=>{
         pontuacao=0
         
         telas.game.inicializar()  
+        
         started=true
-        mudarTela(telas.game)
+        if(gameOver==false){
+            mudarTela(telas.game)
+        }else{
+            if(passouIntervalo) mudarTela(telas.game)
+            passouIntervalo=false
+        }
+        gameOver=false
         flappyBird.posicaoY=60
         flappyBird.velocidade=0
     }else{
