@@ -175,7 +175,7 @@ function criaCanos(){
         baixoImgPosicaoX:52,
         baixoImgPosicaoY:170,
         baixoImgSizeX:54,
-        baixoImgSizeY:403,
+        baixoImgSizeY:398,
 
         espacamentoCano: 120,
         
@@ -239,7 +239,27 @@ const telas={
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
                 return true
             }
+            let larguraFlappyBird=flappyBird.largura
+            let posicaoXFlappyBird=flappyBird.posicaoX
+            let cabecaFlappyBird=canvasHeight - flappyBird.posicaoY
+            let pataFlappyBird=  cabecaFlappyBird-flappyBird.altura
+            for(let i=0; i<variaveisGlobais.canos.length ; i++){
+                let { cimaCanvasPosicaoY, espacamentoCano, baixoCanvasPosicaoX,cimaCanvasSizeX } = variaveisGlobais.canos[i]
 
+                if( posicaoXFlappyBird+larguraFlappyBird>=baixoCanvasPosicaoX &&
+                    posicaoXFlappyBird<=baixoCanvasPosicaoX+cimaCanvasSizeX ){
+
+                        if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
+                            return true
+                        }
+                        if(  flappyBird.posicaoY <=  cimaCanvasPosicaoY-espacamentoCano ){
+                            return true
+                        }
+                }
+                // variaveisGlobais.canos[i].cimaCanvasPosicaoY
+                // variaveisGlobais.canos[i].espacamentoCano
+                // variaveisGlobais.canos[i].baixoCanvasPosicaoX
+            }
 
             return false
         },
