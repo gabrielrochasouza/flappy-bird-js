@@ -1,5 +1,5 @@
 @font-face {
-    src:url("../../flappybirdy-font/Flappy-Bird.ttf");
+    src:url("../flappybirdy-font/Flappy-Bird.ttf");
     font-family:'flappyBird';
 }
 body{
@@ -39,6 +39,11 @@ span{
     width: 100%;
     left: 0;
     top: 20px;
+
+    -webkit-user-select: none;  
+    -moz-user-select: none;     
+    -ms-user-select: none;      
+    user-select: none;  
 }
 .hidden{
     display: none;

@@ -24,9 +24,9 @@ const recorde=document.getElementById('recorde')
 const audioPular=new Audio()
 const audioCaiu=new Audio()
 const audioPonto=new Audio()
-audioPular.src='../../audio/efeitos_pulo.wav'
-audioCaiu.src='../../audio/efeitos_caiu.wav'
-audioPonto.src='../../audio/efeitos_ponto.wav'
+audioPular.src='src/audio/efeitos_pulo.wav'
+audioCaiu.src='src/audio/efeitos_caiu.wav'
+audioPonto.src='src/audio/efeitos_ponto.wav'
 
 /***********/
 const flappyBird={
@@ -58,15 +58,14 @@ const flappyBird={
             gameOver=true  
             started=false     
             this.velocidade=0
+
             audioCaiu.play()
-            
-            setTimeout(() => {
-                recorde.classList.remove('hidden')
-                span.classList.add('mudarPosicao')
-                mudarTela(telas.youLose)
-                passouIntervalo=true
-            }, 200);
-            
+            mudarTela(telas.youLose)
+
+            recorde.classList.remove('hidden')
+            span.classList.add('mudarPosicao')
+            passouIntervalo=true 
+
             return
         }
         chao.movimentoChao()
@@ -258,7 +257,9 @@ const telas={
             
         },
         click(){
-            
+            span.classList.remove('hidden')
+            started=true
+            mudarTela(telas.game)
             return true
         }
     },
@@ -267,7 +268,7 @@ const telas={
             variaveisGlobais.canos=[]
             variaveisGlobais.canos.push( criaCanos() )
             span.innerText=0
-            span.classList.remove('hidden')
+            
             span.classList.remove('mudarPosicao')
             recorde.classList.add('hidden')
         },
@@ -284,7 +285,7 @@ const telas={
 
                 if( posicaoXFlappyBird+larguraFlappyBird>=baixoCanvasPosicaoX &&
                     posicaoXFlappyBird<baixoCanvasPosicaoX+cimaCanvasSizeX ){
-
+                    
                     if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
                         return true
                     }
@@ -329,9 +330,6 @@ const telas={
                 }
                 for(let i=0; i<variaveisGlobais.canos.length ; i++){
                     variaveisGlobais.canos[i].desenhaCano()
-                    // if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
-                    //     variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
-                    // }
                 }
                 telas.game.retirarCano()
             }
@@ -346,7 +344,7 @@ const telas={
         retirarCano(){
             for(let i=0; i<variaveisGlobais.canos.length ; i++){
                 if( variaveisGlobais.canos[i].cimaCanvasPosicaoX<-variaveisGlobais.canos[i].cimaCanvasSizeX ){
-                    variaveisGlobais.canos.shift() //variaveisGlobais.canos[i].cimaCanvasSizeX
+                    variaveisGlobais.canos.shift() 
                 }
             }
         }
@@ -360,7 +358,6 @@ const telas={
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
 
-            //planoFundoGameOver.desenhaFundoGameOver()
             ctx.drawImage(
                 sprites,
                 132,151,
@@ -377,6 +374,9 @@ const telas={
             flappyBird.posicaoY+=flappyBird.velocidade
         },
         click(){
+            started=false
+            span.classList.add('hidden')
+            mudarTela(telas.inicio)
             return true
         }
     }
@@ -400,20 +400,10 @@ document.addEventListener('click', ()=>{
         frames=0
         timeToStart=0
         pontuacao=0
-        
         telas.game.inicializar()  
-        
-        started=true
-        if(gameOver==false){
-            mudarTela(telas.game)
-        }else{
-            if(passouIntervalo) mudarTela(telas.game)
-            passouIntervalo=false
-        }
+
         gameOver=false
         flappyBird.posicaoY=60
         flappyBird.velocidade=0
-    }else{
-        telaAtiva.click()
     }
 })
