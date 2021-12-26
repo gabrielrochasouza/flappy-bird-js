@@ -234,6 +234,7 @@ const telas={
         movimentar(){
         },
         click(){
+            
             return true
         }
     },
