@@ -13,12 +13,17 @@ let gameOver=false
 const arrCanos=[]
 let frames=0
 let timeToStart=0
+let pontuacao=0
+const span=document.querySelector('span')
+
 
 /**Audio */
 const audioPular=new Audio()
 const audioCaiu=new Audio()
+const audioPonto=new Audio()
 audioPular.src='../../audio/efeitos_pulo.wav'
 audioCaiu.src='../../audio/efeitos_caiu.wav'
+audioPonto.src='../../audio/efeitos_ponto.wav'
 
 /***********/
 const flappyBird={
@@ -29,7 +34,7 @@ const flappyBird={
     spritePosicaoX:0,
     spritePosicaoY:0,
     velocidade:0,
-    gravidade: 0.25,
+    gravidade: 0.30,
     desenharFlappyBird(){
         ctx.drawImage(
             sprites,
@@ -44,6 +49,8 @@ const flappyBird={
             gameOver=true  
             started=false     
             audioCaiu.play()
+            span.innerText=0
+            span.classList.add('hidden')
             mudarTela(telas.youLose)
             return
         }
@@ -159,23 +166,23 @@ const variaveisGlobais={}
 function criaCanos(){
 
     const canos={
-        cimaCanvasSizeX: 55,//tamanho X do cano canvas
+        cimaCanvasSizeX: 54,//tamanho X do cano canvas
         cimaCanvasSizeY: 500,//tamanho Y do cano canvas
         cimaCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
         cimaCanvasPosicaoY:canvasHeight-randomNum(),//posicao Y do cano canvas
         cimaImgPosicaoX:0,
         cimaImgPosicaoY:169,
-        cimaImgSizeX:54,
+        cimaImgSizeX:52,
         cimaImgSizeY:403,
         
-        baixoCanvasSizeX: 55,//tamanho X do cano canvas
+        baixoCanvasSizeX: 54,//tamanho X do cano canvas
         baixoCanvasSizeY: 500,//tamanho Y do cano canvas
         baixoCanvasPosicaoX: canvasWidth,//posicao X do cano canvas
         baixoCanvasPosicaoY:0,//posicao Y do cano canvas
         baixoImgPosicaoX:52,
         baixoImgPosicaoY:170,
-        baixoImgSizeX:54,
-        baixoImgSizeY:398,
+        baixoImgSizeX:52,
+        baixoImgSizeY:399,
 
         espacamentoCano: 120,
         
@@ -234,6 +241,7 @@ const telas={
         inicializar(){
             variaveisGlobais.canos=[]
             variaveisGlobais.canos.push( criaCanos() )
+            span.classList.remove('hidden')
         },
         detectarColisao(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
@@ -249,16 +257,19 @@ const telas={
                 if( posicaoXFlappyBird+larguraFlappyBird>=baixoCanvasPosicaoX &&
                     posicaoXFlappyBird<=baixoCanvasPosicaoX+cimaCanvasSizeX ){
 
-                        if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
-                            return true
-                        }
-                        if(  flappyBird.posicaoY <=  cimaCanvasPosicaoY-espacamentoCano ){
-                            return true
-                        }
+                    if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
+                        return true
+                    }
+                    if(  flappyBird.posicaoY <=  cimaCanvasPosicaoY-espacamentoCano ){
+                        return true
+                    }
+                    if( posicaoXFlappyBird ==baixoCanvasPosicaoX ){//marca pontos
+                        pontuacao++
+                        console.log(pontuacao)
+                        span.innerText=pontuacao
+                        audioPonto.play()
+                    }
                 }
-                // variaveisGlobais.canos[i].cimaCanvasPosicaoY
-                // variaveisGlobais.canos[i].espacamentoCano
-                // variaveisGlobais.canos[i].baixoCanvasPosicaoX
             }
 
             return false
@@ -281,7 +292,7 @@ const telas={
         animacaoCanosDesenho(){
             timeToStart++
             
-            if(timeToStart>70){
+            if(timeToStart>100){
                 frames++
                 if(frames%81==80){
                     variaveisGlobais.canos.push( criaCanos() )
@@ -296,7 +307,7 @@ const telas={
             }
         },
         animacaoCanosMovimento(){
-            if(timeToStart>70){
+            if(timeToStart>100){
                 for(let i=0; i<variaveisGlobais.canos.length ; i++){
                     variaveisGlobais.canos[i].movimentarEmX()
                 }
@@ -348,6 +359,8 @@ document.addEventListener('click', ()=>{
         variaveisGlobais.canos=[]
         frames=0
         timeToStart=0
+        pontuacao=0
+        
         telas.game.inicializar()  
         started=true
         mudarTela(telas.game)
