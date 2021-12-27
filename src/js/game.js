@@ -39,20 +39,24 @@ const flappyBird={
     spritePosicaoY:0,
     velocidade:0,
     gravidade: 0.30,
-    angle: 0,
-    aceleracaoAngular: 0.2* Math.PI/180,// 0.2 graus por frame quadrado 
-    velocidadeAngular: Math.PI/180, //1 grau por frame
+    angle:0,
+    aceleracaoAngular: 1* Math.PI/180,// 1 graus por frame quadrado 
+    velocidadeAngular: 1, //0 grau por frame
     desenharFlappyBird(){
-        
+        ctx.save()
+        ctx.translate(this.posicaoX+this.largura/2,this.posicaoY+this.altura/2)
+        ctx.rotate(this.angle)
+        // ctx.fillStyle='yellow'
+        // ctx.fillRect(0,0,this.largura,this.altura)
         ctx.drawImage(
             sprites,
             this.spritePosicaoX,this.spritePosicaoY,
             this.largura,this.altura,
-            this.posicaoX,this.posicaoY,
+            -this.largura/2,-this.altura/2,
+            // this.posicaoX,this.posicaoY,
             this.largura,this.altura
         )
-       
-     
+        ctx.restore()
     },
     movimentoUpdate(){
         if(  telas.game.detectarColisao()  ){     
@@ -66,16 +70,19 @@ const flappyBird={
             recorde.classList.remove('hidden')
             span.classList.add('mudarPosicao')
             passouIntervalo=true 
-
             return
         }
         chao.movimentoChao()
         flappyBird.animacao()
+
+        this.rotacionar()
+        
+        
         this.velocidade=this.gravidade+this.velocidade
         this.posicaoY+=this.velocidade
     },
     pular(){
-        this.angle=45 * Math.PI / 180
+        this.angle= -20 * Math.PI / 180
         flappyBird.velocidade= -6
         audioPular.play()
     },
@@ -93,6 +100,11 @@ const flappyBird={
         if(intervaloRepetidor < this.repeticao && intervaloRepetidor >= 2*this.repeticao/3 ) this.indice=2 
 
         this.spritePosicaoY= this.quadros[this.indice]
+    },
+    rotacionar(){
+        if(this.velocidade>=0 && this.angle<90*Math.PI/180) {
+            this.angle+=3*Math.PI/180
+        }
     }
     
 }
@@ -416,12 +428,14 @@ const telas={
         },
         movimentar(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY ) return
+            flappyBird.rotacionar()
             flappyBird.velocidade=flappyBird.gravidade+flappyBird.velocidade
             flappyBird.posicaoY+=flappyBird.velocidade
         },
         click(){
             bateuRecorde=false
             started=false
+            flappyBird.angle=0
             span.classList.add('hidden')
             mudarTela(telas.inicio)
             return true
@@ -431,8 +445,8 @@ const telas={
 
 
 function gameStarted(){
-    telaAtiva.desenhar()
     telaAtiva.movimentar()
+    telaAtiva.desenhar()
 
     requestAnimationFrame(gameStarted)      
 }
