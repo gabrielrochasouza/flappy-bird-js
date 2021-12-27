@@ -402,7 +402,7 @@ const telas={
             
             ctx.drawImage(
                 sprites,
-                132,151,
+                132,152,
                 236,206,
                 (canvasWidth-236)/2,100,
                 236,206
