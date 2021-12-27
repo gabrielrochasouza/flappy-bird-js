@@ -7,12 +7,13 @@ const sprites=new Image()
 sprites.src='src/img/sprites.png'
 const ctx=canvas.getContext('2d')
 
-
+/**Booleanos verificadores */
 let started=false
 let gameOver=false
 let passouIntervalo=false
+let bateuRecorde=false
+/**************** */
 
-const arrCanos=[]
 let frames=0
 let timeToStart=0
 let pontuacao=0
@@ -107,7 +108,7 @@ const chao={
     canvasPosicaoY: canvasHeight-100,
     desenharChao(){
         if(gameOver==false){
-            flappyBird.animacao()
+            //flappyBird.animacao()
         }
         if(gameOver==false && started==false) chao.movimentoChao()
         
@@ -181,6 +182,43 @@ function randomNum(){
     return Math.random()*(350-150)+150
 }
 
+const medalhas={
+    medalhaEscolhidaPosicaoSpriteX:0 ,
+    medalhaEscolhidaPosicaoSpriteY:124,
+    imgSpriteMedalhaSizeX:45,
+    imgSpriteMedalhaSizeY:45,
+    canvasPosicaoX:93,
+    canvasPosicaoY:190,
+    canvasSizeX:42,
+    canvasSizeY:42,
+
+    desenharMedalha(){
+        ctx.drawImage(
+            sprites,
+            this.medalhaEscolhidaPosicaoSpriteX,this.medalhaEscolhidaPosicaoSpriteY,
+            this.imgSpriteMedalhaSizeX,this.imgSpriteMedalhaSizeY,
+            this.canvasPosicaoX,this.canvasPosicaoY,
+            this.canvasSizeX,this.canvasSizeY
+        )
+    },escolherMedalha(pontos,recorde){
+        if(pontos<10 ){//branca
+            this.medalhaEscolhidaPosicaoSpriteX=0
+            this.medalhaEscolhidaPosicaoSpriteY=78
+        }
+        if(pontos>=10 && pontos<20 ){//bronze
+            this.medalhaEscolhidaPosicaoSpriteX=48
+            this.medalhaEscolhidaPosicaoSpriteY=124
+        }
+        if(pontos>=20 && pontos<30){//prata
+            this.medalhaEscolhidaPosicaoSpriteX=48
+            this.medalhaEscolhidaPosicaoSpriteY=78
+        }
+        if(pontos>=30 ){//ouro
+            this.medalhaEscolhidaPosicaoSpriteX=0
+            this.medalhaEscolhidaPosicaoSpriteY=124
+        }
+    }
+}
 
 
 const variaveisGlobais={}
@@ -254,7 +292,7 @@ const telas={
             telaInicial.desenharTelaInicial()
         },
         movimentar(){
-            
+            flappyBird.animacao()
         },
         click(){
             span.classList.remove('hidden')
@@ -295,8 +333,9 @@ const telas={
                     if( posicaoXFlappyBird ==baixoCanvasPosicaoX ){//marca pontos
                         pontuacao++
                         span.innerText=pontuacao
+                        if(pontuacao>pontuacaoRecorde) bateuRecorde=true
                         pontuacaoRecorde=pontuacaoRecorde<pontuacao ? pontuacao : pontuacaoRecorde 
-                        recorde.innerText=pontuacaoRecorde
+                        if(pontuacaoRecorde>0) recorde.innerText=pontuacaoRecorde
                         audioPonto.play()
                     }
                 }
@@ -311,6 +350,8 @@ const telas={
             this.animacaoCanosDesenho()
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
+
+            
         },
         movimentar(){
             flappyBird.movimentoUpdate()
@@ -358,6 +399,7 @@ const telas={
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
 
+            
             ctx.drawImage(
                 sprites,
                 132,151,
@@ -366,6 +408,10 @@ const telas={
                 236,206
             )
             
+            if( bateuRecorde ){
+                medalhas.escolherMedalha(pontuacao,pontuacaoRecorde)
+                medalhas.desenharMedalha()
+            }
             
         },
         movimentar(){
@@ -374,6 +420,7 @@ const telas={
             flappyBird.posicaoY+=flappyBird.velocidade
         },
         click(){
+            bateuRecorde=false
             started=false
             span.classList.add('hidden')
             mudarTela(telas.inicio)
