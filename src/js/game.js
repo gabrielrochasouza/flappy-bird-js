@@ -187,7 +187,7 @@ const medalhas={
     medalhaEscolhidaPosicaoSpriteY:124,
     imgSpriteMedalhaSizeX:45,
     imgSpriteMedalhaSizeY:45,
-    canvasPosicaoX:93,
+    canvasPosicaoX:canvasWidth>=350 ? 93 : 73,
     canvasPosicaoY:190,
     canvasSizeX:42,
     canvasSizeY:42,
@@ -201,21 +201,21 @@ const medalhas={
             this.canvasSizeX,this.canvasSizeY
         )
     },escolherMedalha(pontos,recorde){
-        if(pontos<10 ){//branca
-            this.medalhaEscolhidaPosicaoSpriteX=0
-            this.medalhaEscolhidaPosicaoSpriteY=78
+        if(pontos<10 ){//bronze
+            this.medalhaEscolhidaPosicaoSpriteX=48   //48
+            this.medalhaEscolhidaPosicaoSpriteY=124  //124
         }
-        if(pontos>=10 && pontos<20 ){//bronze
-            this.medalhaEscolhidaPosicaoSpriteX=48
-            this.medalhaEscolhidaPosicaoSpriteY=124
+        if(pontos>=10 && pontos<20 ){// prata
+            this.medalhaEscolhidaPosicaoSpriteX=48  //48
+            this.medalhaEscolhidaPosicaoSpriteY=78 //78
         }
-        if(pontos>=20 && pontos<30){//prata
-            this.medalhaEscolhidaPosicaoSpriteX=48
-            this.medalhaEscolhidaPosicaoSpriteY=78
+        if(pontos>=20 && pontos<30){// ouro
+            this.medalhaEscolhidaPosicaoSpriteX=0 //0
+            this.medalhaEscolhidaPosicaoSpriteY=124 //124
         }
-        if(pontos>=30 ){//ouro
-            this.medalhaEscolhidaPosicaoSpriteX=0
-            this.medalhaEscolhidaPosicaoSpriteY=124
+        if(pontos>=30 ){// platina
+            this.medalhaEscolhidaPosicaoSpriteX=0  // 0
+            this.medalhaEscolhidaPosicaoSpriteY=78 // 78
         }
     }
 }
