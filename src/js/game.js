@@ -295,7 +295,7 @@ function mudarTela(InicioOuGame){
 const telas={
     inicio:{
         desenhar(){
-            ctx.fillStyle='lightblue'
+            ctx.fillStyle='#70c5ce'
             ctx.fillRect(0,0,canvasWidth,canvasHeight)
             planoFundo.desenhaFundo()
             chao.desenharChao()
@@ -356,7 +356,7 @@ const telas={
             return false
         },
         desenhar(){
-            ctx.fillStyle='lightblue'
+            ctx.fillStyle='#70c5ce'
             ctx.fillRect(0,0,canvasWidth,canvasHeight)
             planoFundo.desenhaFundo()
             this.animacaoCanosDesenho()
@@ -404,7 +404,7 @@ const telas={
     },
     youLose:{
         desenhar(){
-            ctx.fillStyle='lightblue'
+            ctx.fillStyle='#70c5ce'
             ctx.fillRect(0,0,canvasWidth,canvasHeight)
             planoFundo.desenhaFundo()
             telas.game.animacaoCanosDesenho()
