@@ -77,7 +77,6 @@ const flappyBird={
 
         this.rotacionar()
         
-        
         this.velocidade=this.gravidade+this.velocidade
         this.posicaoY+=this.velocidade
     },
@@ -106,7 +105,6 @@ const flappyBird={
             this.angle+=3*Math.PI/180
         }
     }
-    
 }
 
 const chao={
@@ -232,8 +230,8 @@ const medalhas={
     }
 }
 
-
 const variaveisGlobais={}
+variaveisGlobais.canos=[]
 
 function criaCanos(){
 
@@ -291,7 +289,6 @@ let telaAtiva={}
 function mudarTela(InicioOuGame){
     telaAtiva=InicioOuGame //InicioOuGame é um objeto ex: telas.inicio ou telas.game
 }
-
 const telas={
     inicio:{
         desenhar(){
@@ -307,6 +304,8 @@ const telas={
             flappyBird.animacao()
         },
         click(){
+            span.innerText=0
+            
             span.classList.remove('hidden')
             started=true
             mudarTela(telas.game)
@@ -314,14 +313,6 @@ const telas={
         }
     },
     game:{
-        inicializar(){
-            variaveisGlobais.canos=[]
-            variaveisGlobais.canos.push( criaCanos() )
-            span.innerText=0
-            
-            span.classList.remove('mudarPosicao')
-            recorde.classList.add('hidden')
-        },
         detectarColisao(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY){
                 return true
@@ -352,7 +343,6 @@ const telas={
                     }
                 }
             }
-
             return false
         },
         desenhar(){
@@ -362,8 +352,6 @@ const telas={
             this.animacaoCanosDesenho()
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
-
-            
         },
         movimentar(){
             flappyBird.movimentoUpdate()
@@ -377,7 +365,7 @@ const telas={
             
             if(timeToStart>100){
                 frames++
-                if(frames%81==80){
+                if(frames%81==80 && gameOver==false){
                     variaveisGlobais.canos.push( criaCanos() )
                     frames=0
                 }
@@ -411,7 +399,6 @@ const telas={
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
 
-            
             ctx.drawImage(
                 sprites,
                 132,152,
@@ -419,12 +406,10 @@ const telas={
                 (canvasWidth-236)/2,100,
                 236,206
             )
-            
             if( bateuRecorde ){
                 medalhas.escolherMedalha(pontuacao,pontuacaoRecorde)
                 medalhas.desenharMedalha()
             }
-            
         },
         movimentar(){
             if(flappyBird.posicaoY+flappyBird.altura>chao.canvasPosicaoY ) return
@@ -433,38 +418,63 @@ const telas={
             flappyBird.posicaoY+=flappyBird.velocidade
         },
         click(){
-            bateuRecorde=false
-            started=false
-            flappyBird.angle=0
-            span.classList.add('hidden')
-            mudarTela(telas.inicio)
+            /*posicao botao
+                esquerda cima:
+                    x:110  y:270 
+                esquerda baixo:
+                    x:110  y:310  
+                direita cima:
+                    x:230  y:270 
+                direita baixo:
+                    x:230  y:310 
+                ----------------
+                    130<x<230
+                    270<y<310
+                variaveis de verificacao
+                    clickPosicaoX
+                    clickPosicaoY
+            */ 
+            if( clickPosicaoX<=230 && clickPosicaoX >=110 &&
+                clickPosicaoY>=270 && clickPosicaoY<=310   ){
+                    bateuRecorde=false
+                    started=false
+                    gameOver=false
+
+                    flappyBird.angle=0
+                    flappyBird.posicaoY=60
+                    flappyBird.velocidade=0
+                    
+                    timeToStart=0
+                    pontuacao=0
+                    variaveisGlobais.canos=[]
+
+                    span.classList.add('hidden')
+                    recorde.classList.add('hidden')
+                    span.classList.remove('mudarPosicao')
+                    
+                    mudarTela(telas.inicio)
+                }
+            
             return true
         }
     }
 }
 
-
 function gameStarted(){
     telaAtiva.movimentar()
     telaAtiva.desenhar()
-
     requestAnimationFrame(gameStarted)      
 }
 mudarTela(telas.inicio)
 gameStarted()
 
+let clickPosicaoX
+let clickPosicaoY
 
-
-document.addEventListener('click', ()=>{
-    if( telaAtiva.click() ){
-        variaveisGlobais.canos=[]
+document.addEventListener('click', (e)=>{
+    clickPosicaoX=e.offsetX
+    clickPosicaoY=e.offsetY
+    if( telaAtiva.click() ){ 
         frames=0
-        timeToStart=0
-        pontuacao=0
-        telas.game.inicializar()  
-
-        gameOver=false
-        flappyBird.posicaoY=60
-        flappyBird.velocidade=0
     }
 })
