@@ -34,7 +34,7 @@ const flappyBird={
     largura:33,
     altura:24,
     posicaoX:20,
-    posicaoY: 60,
+    posicaoY: 150,
     spritePosicaoX:0,
     spritePosicaoY:0,
     velocidade:0,
@@ -42,6 +42,7 @@ const flappyBird={
     angle:0,
     aceleracaoAngular: 1* Math.PI/180,// 1 graus por frame quadrado 
     velocidadeAngular: 1, //0 grau por frame
+
     desenharFlappyBird(){
         ctx.save()
         ctx.translate(this.posicaoX+this.largura/2,this.posicaoY+this.altura/2)
@@ -99,11 +100,24 @@ const flappyBird={
         if(intervaloRepetidor < this.repeticao && intervaloRepetidor >= 2*this.repeticao/3 ) this.indice=2 
 
         this.spritePosicaoY= this.quadros[this.indice]
+        
     },
     rotacionar(){
         if(this.velocidade>=0 && this.angle<90*Math.PI/180) {
             this.angle+=3*Math.PI/180
         }
+    },
+     
+    flutuar(){
+        
+        if(this.velocidade>=1.2){
+            this.velocidade=-this.velocidade 
+            
+        }else{
+            this.velocidade+=0.03
+        }
+        this.posicaoY+=this.velocidade
+        console.log(flappyBird.posicaoY)
     }
 }
 
@@ -302,6 +316,7 @@ const telas={
         },
         movimentar(){
             flappyBird.animacao()
+            flappyBird.flutuar()
         },
         click(){
             span.innerText=0
@@ -311,6 +326,7 @@ const telas={
             mudarTela(telas.game)
             return true
         }
+
     },
     game:{
         detectarColisao(){
@@ -441,7 +457,7 @@ const telas={
                     gameOver=false
 
                     flappyBird.angle=0
-                    flappyBird.posicaoY=60
+                    flappyBird.posicaoY=150
                     flappyBird.velocidade=0
                     
                     timeToStart=0
