@@ -54,7 +54,7 @@ const flappyBird={
             this.largura,this.altura,
             -this.largura/2,-this.altura/2,
             // this.posicaoX,this.posicaoY,
-            this.largura,this.altura
+            this.largura*1.15,this.altura*1.15
         )
         ctx.restore()
     },
@@ -319,7 +319,8 @@ const telas={
         click(){
             span.innerText=0
             span.classList.remove('hidden')
-            flappyBird.posicaoX=160
+            let varAux=Math.floor((canvasWidth-flappyBird.largura)/2)
+            flappyBird.posicaoX= varAux%2==0 ? varAux : varAux-1  
             audioPular.play()
 
             mudarTela(telas.ready)
@@ -382,7 +383,7 @@ const telas={
         animacaoCanosDesenho(){
             timeToStart++
             
-            if(timeToStart>100){
+            if(timeToStart>80){
                 frames++
                 if(frames%81==80 && gameOver==false){
                     variaveisGlobais.canos.push( criaCanos() )
