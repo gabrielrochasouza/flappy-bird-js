@@ -40,8 +40,7 @@ const flappyBird={
     velocidade:0,
     gravidade: 0.30,
     angle:0,
-    aceleracaoAngular: 1* Math.PI/180,// 1 graus por frame quadrado 
-    velocidadeAngular: 1, //0 grau por frame
+    velocidadeAngular: 4, // grau por frame
 
     desenharFlappyBird(){
         ctx.save()
@@ -104,10 +103,10 @@ const flappyBird={
     },
     rotacionar(){
         if(this.velocidade>=0 && this.angle<90*Math.PI/180) {
-            this.angle+=3*Math.PI/180
+            this.angle+=this.velocidadeAngular*Math.PI/180
         }
     },
-     
+    
     flutuar(){
         
         if(this.velocidade>=1.2){
@@ -117,7 +116,6 @@ const flappyBird={
             this.velocidade+=0.03
         }
         this.posicaoY+=this.velocidade
-        console.log(flappyBird.posicaoY)
     }
 }
 
@@ -320,10 +318,11 @@ const telas={
         },
         click(){
             span.innerText=0
-            
             span.classList.remove('hidden')
-            started=true
-            mudarTela(telas.game)
+            flappyBird.posicaoX=160
+            audioPular.play()
+
+            mudarTela(telas.ready)
             return true
         }
 
@@ -335,14 +334,17 @@ const telas={
             }
             let larguraFlappyBird=flappyBird.largura
             let posicaoXFlappyBird=flappyBird.posicaoX
+            
             let cabecaFlappyBird=canvasHeight - flappyBird.posicaoY
             let pataFlappyBird=  cabecaFlappyBird-flappyBird.altura
+
+            
+
             for(let i=0; i<variaveisGlobais.canos.length ; i++){
                 let { cimaCanvasPosicaoY, espacamentoCano, baixoCanvasPosicaoX,cimaCanvasSizeX } = variaveisGlobais.canos[i]
 
                 if( posicaoXFlappyBird+larguraFlappyBird>=baixoCanvasPosicaoX &&
                     posicaoXFlappyBird<baixoCanvasPosicaoX+cimaCanvasSizeX ){
-                    
                     if(pataFlappyBird<= canvasHeight -cimaCanvasPosicaoY){
                         return true
                     }
@@ -368,6 +370,7 @@ const telas={
             this.animacaoCanosDesenho()
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
+           
         },
         movimentar(){
             flappyBird.movimentoUpdate()
@@ -415,6 +418,7 @@ const telas={
             chao.desenharChao()
             flappyBird.desenharFlappyBird()
 
+            
             ctx.drawImage(
                 sprites,
                 132,152,
@@ -422,6 +426,8 @@ const telas={
                 (canvasWidth-236)/2,100,
                 236,206
             )
+            
+            
             if( bateuRecorde ){
                 medalhas.escolherMedalha(pontuacao,pontuacaoRecorde)
                 medalhas.desenharMedalha()
@@ -458,6 +464,7 @@ const telas={
 
                     flappyBird.angle=0
                     flappyBird.posicaoY=150
+                    flappyBird.posicaoX=20
                     flappyBird.velocidade=0
                     
                     timeToStart=0
@@ -473,6 +480,28 @@ const telas={
             
             return true
         }
+    },
+    ready:{
+        desenhar(){
+            ctx.fillStyle='#70c5ce'
+            ctx.fillRect(0,0,canvasWidth,canvasHeight)
+            planoFundo.desenhaFundo()
+            chao.desenharChao()
+            
+            flappyBird.desenharFlappyBird()
+        },
+        movimentar(){
+            flappyBird.animacao()
+            flappyBird.flutuar()
+        },
+        click(){
+            started=true
+            flappyBird.pular()
+            mudarTela(telas.game)
+            
+            return true
+        }
+
     }
 }
 
