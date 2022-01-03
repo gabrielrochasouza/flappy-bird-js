@@ -31,12 +31,14 @@ audioPonto.src='src/audio/efeitos_ponto.wav'
 
 /***********/
 const flappyBird={
-    largura:33,
-    altura:24,
+    largura:33*1.2,
+    altura:24*1.2,
     posicaoX:20,
     posicaoY: 150,
     spritePosicaoX:0,
     spritePosicaoY:0,
+    spriteLargura:33,
+    spriteAltura:24,
     velocidade:0,
     gravidade: 0.30,
     angle:0,
@@ -46,15 +48,13 @@ const flappyBird={
         ctx.save()
         ctx.translate(this.posicaoX+this.largura/2,this.posicaoY+this.altura/2)
         ctx.rotate(this.angle)
-        // ctx.fillStyle='yellow'
-        // ctx.fillRect(0,0,this.largura,this.altura)
+
         ctx.drawImage(
             sprites,
             this.spritePosicaoX,this.spritePosicaoY,
-            this.largura,this.altura,
+            this.spriteLargura,this.spriteAltura,
             -this.largura/2,-this.altura/2,
-            // this.posicaoX,this.posicaoY,
-            this.largura*1.15,this.altura*1.15
+            this.largura,this.altura
         )
         ctx.restore()
     },
@@ -383,7 +383,7 @@ const telas={
         animacaoCanosDesenho(){
             timeToStart++
             
-            if(timeToStart>80){
+            if(timeToStart>50){
                 frames++
                 if(frames%81==80 && gameOver==false){
                     variaveisGlobais.canos.push( criaCanos() )
