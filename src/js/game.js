@@ -42,7 +42,7 @@ const flappyBird={
     velocidade:0,
     gravidade: 0.30,
     angle:0,
-    velocidadeAngular: 4, // grau por frame
+    velocidadeAngular: 7, // grau por frame
 
     desenharFlappyBird(){
         ctx.save()
@@ -102,7 +102,7 @@ const flappyBird={
         
     },
     rotacionar(){
-        if(this.velocidade>=0 && this.angle<90*Math.PI/180) {
+        if(this.velocidade>=4 && this.angle<90*Math.PI/180) {
             this.angle+=this.velocidadeAngular*Math.PI/180
         }
     },
@@ -375,6 +375,7 @@ const telas={
         },
         movimentar(){
             flappyBird.movimentoUpdate()
+            flappyBird.animacao()
             telas.game.animacaoCanosMovimento()
         },
         click(){
